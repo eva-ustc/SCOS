@@ -14,10 +14,23 @@
         <activity android:name=".activity.SCOSEntryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activity.MainScreenActivity">
+            <intent-filter>
+                <action android:name="scos.intent.action.SCOSMAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="scos.intent.category.SCOSLAUNCHER"/>
+            </intent-filter>
+        </activity>
+       <!-- <activity android:name=".activity.MainScreen2Activity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>-->
     </application>
 
 </manifest>
