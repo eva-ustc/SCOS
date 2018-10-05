@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">SCOS</string>
+    <string name="logo_text">吃货聚集地</string>
+    <string name="et_account">用户名/手机号码/邮箱</string>
+    <string name="et_password">密码</string>
+    <string name="btn_login">登陆</string>
+    <string name="btn_return">返回</string>
+    <string name="tv_forgetpwd">忘记密码?</string>
+    <string name="tv_signup">新用户注册?</string>
+    <string name="tv_msg_bottom">登陆即代表阅读并同意</string>
+    <string name="tv_msg_serviceitem">服务条款</string>
 </resources>

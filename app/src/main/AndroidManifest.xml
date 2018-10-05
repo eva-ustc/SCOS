@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="es.source.code.scos">
-
+    <uses-permission android:name="scos.permission.ACCESSSCOS"/>
+    <permission android:name="scos.permission.ACCESSSCOS" android:protectionLevel="dangerous" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_logo"
@@ -17,12 +18,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainScreenActivity">
+        <activity android:name=".activity.MainScreenActivity"
+                  android:permission="scos.permission.ACCESSSCOS">
             <intent-filter>
                 <action android:name="scos.intent.action.SCOSMAIN"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="scos.intent.category.SCOSLAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.LoginOrRegisterActivity">
+
         </activity>
        <!-- <activity android:name=".activity.MainScreen2Activity">
             <intent-filter>

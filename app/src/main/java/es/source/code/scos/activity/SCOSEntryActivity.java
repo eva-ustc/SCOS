@@ -48,13 +48,13 @@ public class SCOSEntryActivity extends Activity {
                 Intent intent = new Intent();
                 intent.setAction(Constants.ACTION_INTENT_SCOSMAIN);
                 intent.addCategory(Constants.CATEGORY_INTENT_SCOSLAUNCHER);
-                intent.setPackage("es.source.code.scos");
-
+                intent.setPackage(SCOSEntryActivity.this.getPackageName());
                 // 传递参数
                 intent.putExtra(Constants.FROM_ENTRY,"FromEntry");
+//                intent.putExtra(Constants.FROM_ENTRY,"FromOthers");
+                startActivity(intent);
 
 //                Intent intent = new Intent(SCOSEntryActivity.this, MainScreenActivity.class); 显示意图
-                startActivity(intent);
 //                Toast.makeText(SCOSEntryActivity.this, "向左滑动了...", Toast.LENGTH_SHORT).show();
             }
             return true;
