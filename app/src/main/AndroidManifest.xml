@@ -26,16 +26,30 @@
                 <category android:name="scos.intent.category.SCOSLAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.LoginOrRegisterActivity">
+        <activity android:name=".activity.LoginOrRegisterActivity" android:launchMode="singleInstance">
+        </activity>
+        <activity android:name=".activity.MainScreenGridViewActivity" android:launchMode="singleInstance">
+
+            <intent-filter>
+                <action android:name="scos.intent.action.GRIDVIEWMAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="scos.intent.category.SCOSLAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.FoodViewActivity">
 
         </activity>
-       <!-- <activity android:name=".activity.MainScreen2Activity">
+        <activity android:name=".activity.FoodInformationActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="scos.action.FOODINFOMATION"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-        </activity>-->
+        </activity>
+        <activity android:name=".activity.FoodOrderViewActivity">
+
+        </activity>
+        <activity android:name=".activity.FoodDetailedActivity">
+        </activity>
     </application>
 
 </manifest>

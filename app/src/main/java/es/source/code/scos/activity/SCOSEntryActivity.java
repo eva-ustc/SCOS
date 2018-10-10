@@ -37,7 +37,6 @@ public class SCOSEntryActivity extends Activity {
     }
 
     class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
-
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             float startX = e1.getX();
@@ -51,15 +50,11 @@ public class SCOSEntryActivity extends Activity {
                 intent.setPackage(SCOSEntryActivity.this.getPackageName());
                 // 传递参数
                 intent.putExtra(Constants.FROM_ENTRY,"FromEntry");
-//                intent.putExtra(Constants.FROM_ENTRY,"FromOthers");
+                // intent.putExtra(Constants.FROM_ENTRY,"FromOthers");
                 startActivity(intent);
-
-//                Intent intent = new Intent(SCOSEntryActivity.this, MainScreenActivity.class); 显示意图
-//                Toast.makeText(SCOSEntryActivity.this, "向左滑动了...", Toast.LENGTH_SHORT).show();
             }
             return true;
         }
-
     }
 }
 

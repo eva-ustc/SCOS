@@ -7,5 +7,6 @@
     <color name="colorgrey">#DCDCDC</color>
     <color name="transparent">#60000000</color>
     <color name="colorDarkRed">#7D3E2F</color>
+    <color name="colorBgtab">#698CC2</color>
 
 </resources>

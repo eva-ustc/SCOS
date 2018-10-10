@@ -80,15 +80,17 @@ public class MainScreenActivity extends Activity implements View.OnClickListener
      */
     @Override
     public void onClick(View view) {
-        if (view==mTv_meal){
+        if (view==mTv_meal){ // 点菜
+
             Toast.makeText(this,"先点菜吧...",Toast.LENGTH_SHORT).show();
-        }else if (view == mTv_order){
+        }else if (view == mTv_order){ // 查看订单
+
             Toast.makeText(this,"看下订单...",Toast.LENGTH_SHORT).show();
-        }else if (view == mTv_login){
+        }else if (view == mTv_login){ // 登陆
+
             Intent intent = new Intent(this,LoginOrRegisterActivity.class);
             startActivity(intent);
-
-        }else if (view == mTv_help){
+        }else if (view == mTv_help){ // 系统帮助
             Toast.makeText(this,"你~需要我的帮助...",Toast.LENGTH_SHORT).show();
         }
     }
