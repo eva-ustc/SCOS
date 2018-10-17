@@ -135,6 +135,7 @@ public class MainScreenGridViewActivity extends Activity{
      * 初始化GridView界面
      */
     private void initView() {
+
         if (isRegister()){
             mUser = new User();
             mUser.setOldUser(this.getSharedPreferences("settings_info",MODE_PRIVATE).getBoolean("isOldUser",false));

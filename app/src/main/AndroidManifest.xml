@@ -28,7 +28,7 @@
         </activity>
         <activity android:name=".activity.LoginOrRegisterActivity" android:launchMode="singleInstance">
         </activity>
-        <activity android:name=".activity.MainScreenGridViewActivity" android:launchMode="singleInstance">
+        <activity android:name=".activity.MainScreenGridViewActivity" >
 
             <intent-filter>
                 <action android:name="scos.intent.action.GRIDVIEWMAIN"/>
