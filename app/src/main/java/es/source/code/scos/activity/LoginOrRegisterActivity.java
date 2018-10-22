@@ -2,9 +2,11 @@ package es.source.code.scos.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -18,7 +20,7 @@ import es.source.code.scos.Constants;
 import es.source.code.scos.R;
 import es.source.code.scos.model.User;
 
-import static es.source.code.scos.Constants.ACTION_INTENT_SCOSMAIN;
+import static es.source.code.scos.activity.MainScreenGridViewActivity.Tag;
 
 /**
  * @author LRK
@@ -30,6 +32,7 @@ import static es.source.code.scos.Constants.ACTION_INTENT_SCOSMAIN;
 
 public class LoginOrRegisterActivity extends Activity implements View.OnClickListener {
 
+    public static final String TAG = "LoginOrRegisterActivity";
     private Button mBtn_login;
     private Button mBtn_return;
     private TextView mEt_account;
@@ -38,6 +41,8 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
     private Matcher mMatcher;
     private ProgressBar mProgressBar_login;
     private TextView mTv_register;
+    private SharedPreferences mLoginInfo;
+    private String mSp_username;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,11 +68,41 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
         mEt_account = this.findViewById(R.id.et_account);
         mEt_password = this.findViewById(R.id.et_password);
         mProgressBar_login = this.findViewById(R.id.progressbar_login);
+
+        //读取用户登录状态
+
+        mSp_username = getUsername();
+        if (mSp_username !=null) {
+            // 已登录过,隐藏注册按钮,用户名显示保存的用户名
+            Toast.makeText(this,"已登录~",Toast.LENGTH_SHORT).show();
+            mEt_account.setText(mSp_username);
+        }else {
+            // 未登录过,隐藏登录按钮
+            Toast.makeText(this,"未登录~",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 查看sharedPreference是否有用户登录信息
+     * @return
+     */
+    private String getUsername() {
+        mLoginInfo = this.getSharedPreferences(Constants.SHAREDPREFERENCE_USER_INFO,MODE_PRIVATE);
+        String username = mLoginInfo.getString(Constants.SP_USERNAME, null);
+       /* if (username != null) {
+            return username;
+        }*/
+        return username;
     }
 
     @Override
     public void onClick(View v) {
         if (v == mBtn_return){ // 点击返回
+            // 判断是否有用户名记录
+            if (getUsername()!=null){
+                updateUserInfo(null,false);
+            }
+
             // 跳转到MainScreen页面,并传递"Return"参数
             redirect2MainScreen(Constants.PACKAGE_NAME, "Return",null);
         }
@@ -77,10 +112,15 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
         String str_password = mEt_password.getText().toString().trim();
         if (v == mBtn_login){ // 点击登陆
             if (checkResult){
+                updateUserInfo(mSp_username,true);
                 doProgress(); // 处理进度条函数
             }
         }else if (v == mTv_register){ // 注册
             if (checkResult){
+                // 保存用户信息到SharedPreference
+                updateUserInfo(mEt_account.getText().toString().trim(),true);
+
+                // 构造User对象传递给MainScreen
                 User loginUser = new User();
                 loginUser.setUserName(str_account);
                 loginUser.setPassword(str_password);
@@ -89,6 +129,29 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
                 redirect2MainScreen(Constants.PACKAGE_NAME,"RegisterSuccess",loginUser);
             }
         }
+        Log.d(TAG,"username: " + getUsername());
+    }
+
+    /**
+     *  更新用户登录状态信息
+     * @param username 用户名
+     * @param loginState 是否登陆
+     */
+    private void updateUserInfo(String username,Boolean loginState) {
+        mLoginInfo = this.getSharedPreferences(Constants.SHAREDPREFERENCE_USER_INFO, MODE_PRIVATE);
+        // 获取编辑器 开启编辑模式
+        SharedPreferences.Editor edit = mLoginInfo.edit();
+        // 保存变量
+            //用户名
+        if (username != null) {
+            edit.putString(Constants.SP_USERNAME,username);
+        }
+            //登陆状态
+        if (loginState != null) {
+            edit.putBoolean(Constants.SP_LOGINSTATE,loginState);
+        }
+        // 提交修改 保存到SharePreference
+        edit.commit();
     }
 
     /**

@@ -22,6 +22,8 @@ import es.source.code.scos.Constants;
 import es.source.code.scos.R;
 import es.source.code.scos.model.User;
 
+import static es.source.code.scos.Constants.USER_INFO;
+
 /**
  * @author LRK
  * @project_name SCOS
@@ -33,6 +35,7 @@ import es.source.code.scos.model.User;
 public class MainScreenGridViewActivity extends Activity{
 
     public static final String Tag = "MainScreenGridView";
+
     private GridView mAppGridView;
     private int[] mAppIcons = {
             R.drawable.tab_menu_meal,R.drawable.tab_menu_order,
@@ -52,6 +55,7 @@ public class MainScreenGridViewActivity extends Activity{
     public static List<Map<String,Object>> orderedFoodLists = new ArrayList<>();
     private SharedPreferences mLoginSetting;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +70,7 @@ public class MainScreenGridViewActivity extends Activity{
         }
         if (!TextUtils.isEmpty(mMsg_fromlogin) ) {
             if ("LoginSuccess".equals(mMsg_fromlogin) || "RegisterSuccess".equals(mMsg_fromlogin)){
-                mUser = intent.getParcelableExtra(Constants.USER_INFO);
+                mUser = intent.getParcelableExtra(USER_INFO);
                 updateState(true,mUser);
             }else if ("Return".equals(mMsg_fromlogin)){
 
@@ -88,47 +92,59 @@ public class MainScreenGridViewActivity extends Activity{
     }
 
     private void updateState(boolean loginState,User user){
-        mLoginSetting = this.getSharedPreferences("settings_info", MODE_PRIVATE);
+        mLoginSetting = this.getSharedPreferences(Constants.SHAREDPREFERENCE_USER_INFO, MODE_PRIVATE);
         // 获取编辑器 开启编辑模式
         SharedPreferences.Editor edit = mLoginSetting.edit();
         if (user!=null){
             // 保存变量
-            edit.putBoolean("state",loginState);
-            edit.putString("userName",user.getUserName());
-            edit.putString("password",user.getPassword());
-            edit.putBoolean("isOldUser",user.getOldUser());
+            edit.putBoolean(Constants.SP_LOGINSTATE,loginState);
+            edit.putString(Constants.SP_USERNAME,user.getUserName());
+//            edit.putString("password",user.getPassword());
+//            edit.putBoolean("isOldUser",user.getOldUser());
         }else {
             edit.clear();
         }
-
         // 提交修改 保存到SharePreference
         edit.commit();
     }
-    private boolean isRegister(){
-        mLoginSetting = this.getSharedPreferences("settings_info", MODE_PRIVATE);
-        return mLoginSetting.getBoolean("state",false);
-    }
 
+    /**
+     * 获得焦点时触发,判断是否显示点菜和查看订单功能
+     * @param hasFocus
+     */
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         if (hasFocus){
             mItem_meal = mAppGridView.getChildAt(0);
             mItem_order = mAppGridView.getChildAt(1);
-            if (mMsg_fromentry!=null && !Constants.FROM_ENTRY.equals(mMsg_fromentry)) {
+//            if (mMsg_fromentry!=null && !Constants.FROM_ENTRY.equals(mMsg_fromentry)) {
+            if (!isRegister()) {
                 mItem_meal.setVisibility(View.INVISIBLE);
                 mItem_order.setVisibility(View.INVISIBLE);
+            }else {
+                mItem_meal.setVisibility(View.VISIBLE);
+                mItem_order.setVisibility(View.VISIBLE);
             }
             mItem_login = mAppGridView.getChildAt(2);
             mItem_help= mAppGridView.getChildAt(3);
-            if (isRegister() || mUser!=null /*|| (mMsg_fromlogin!=null && ("LoginSuccess".equals(mMsg_fromlogin) || "RegisterSuccess".equals(mMsg_fromlogin)))*/){
+            /*if (isRegister()){ *//*|| mUser!=null*//*
                 mItem_meal.setVisibility(View.VISIBLE);
                 mItem_order.setVisibility(View.VISIBLE);
             }else {
                 mItem_meal.setVisibility(View.INVISIBLE);
                 mItem_order.setVisibility(View.INVISIBLE);
-            }
+            }*/
         }
         super.onWindowFocusChanged(hasFocus);
+    }
+
+    /**
+     * 判断是否已登录
+     * @return
+     */
+    private boolean isRegister(){
+        mLoginSetting = this.getSharedPreferences(Constants.SHAREDPREFERENCE_USER_INFO, MODE_PRIVATE);
+        return mLoginSetting.getBoolean(Constants.SP_LOGINSTATE,false);
     }
 
     /**
@@ -136,7 +152,7 @@ public class MainScreenGridViewActivity extends Activity{
      */
     private void initView() {
 
-        if (isRegister()){
+        if (isRegister()){  // 已登录
             mUser = new User();
             mUser.setOldUser(this.getSharedPreferences("settings_info",MODE_PRIVATE).getBoolean("isOldUser",false));
         }
@@ -174,6 +190,8 @@ public class MainScreenGridViewActivity extends Activity{
                        break;
                    case 3: // 系统帮助
                        Toast.makeText(MainScreenGridViewActivity.this,"你~需要我的帮助...",Toast.LENGTH_SHORT).show();
+                       intent = new Intent(MainScreenGridViewActivity.this,SCOSHelperActivity.class);
+                       startActivity(intent);
                        break;
                }
             }

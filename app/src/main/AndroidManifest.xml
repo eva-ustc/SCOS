@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="es.source.code.scos">
     <uses-permission android:name="scos.permission.ACCESSSCOS"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission  android:name="android.permission.SEND_SMS"/>
     <permission android:name="scos.permission.ACCESSSCOS" android:protectionLevel="dangerous" />
     <application
         android:allowBackup="true"
@@ -13,10 +15,10 @@
         <activity android:name=".MainActivity">
         </activity>
         <activity android:name=".activity.SCOSEntryActivity">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity android:name=".activity.MainScreenActivity"
                   android:permission="scos.permission.ACCESSSCOS">
@@ -29,7 +31,10 @@
         <activity android:name=".activity.LoginOrRegisterActivity" android:launchMode="singleInstance">
         </activity>
         <activity android:name=".activity.MainScreenGridViewActivity" >
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
             <intent-filter>
                 <action android:name="scos.intent.action.GRIDVIEWMAIN"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -49,6 +54,12 @@
 
         </activity>
         <activity android:name=".activity.FoodDetailedActivity">
+        </activity>
+        <activity android:name=".activity.SCOSHelperActivity">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>-->
         </activity>
     </application>
 
