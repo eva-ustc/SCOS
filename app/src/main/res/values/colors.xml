@@ -8,5 +8,7 @@
     <color name="transparent">#60000000</color>
     <color name="colorDarkRed">#7D3E2F</color>
     <color name="colorBgtab">#698CC2</color>
+    <color name="blueViolet">#8A2BE2</color>
+    <color name="MediumBlue">#0000CD</color>
 
 </resources>

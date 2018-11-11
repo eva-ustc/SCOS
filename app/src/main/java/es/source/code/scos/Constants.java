@@ -27,4 +27,5 @@ public class Constants {
     public static final int REQUEST_CODE_ASK_SEND_EMAIL = 3; // 打电话请求码
     public static final int REQUEST_CODE_ASK_FOR_RESULT = 4; // 打电话请求码
 
+    public static final String MY_PKG_NAME = "es.source.code.scos"; // 包名
 }

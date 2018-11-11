@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/img_logoNotif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:src="@mipmap/ic_launcher_logo"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_foodTitleNotif"
+            android:layout_width="wrap_content"
+            android:textColor="@color/blueViolet"
+            android:layout_height="wrap_content"
+            android:text="新增菜品"/>
+
+        <TextView
+            android:id="@+id/tv_foodInfoNotif"
+            style="@android:style/TextAppearance.StatusBar.EventContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="西凉河醋鱼,69.5元,热菜"
+            android:textSize="15sp"/>
+    </LinearLayout>
+
+
+
+    <Button
+        android:id="@+id/btn_clearNotification"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="清除"/>
+</RelativeLayout>

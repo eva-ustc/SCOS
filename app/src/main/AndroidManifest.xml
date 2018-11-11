@@ -4,6 +4,8 @@
     <uses-permission android:name="scos.permission.ACCESSSCOS"/>
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission  android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <permission android:name="scos.permission.ACCESSSCOS" android:protectionLevel="dangerous" />
     <application
         android:allowBackup="true"
@@ -41,9 +43,8 @@
                 <category android:name="scos.intent.category.SCOSLAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.FoodViewActivity">
+        <activity android:name=".activity.FoodViewActivity"/>
 
-        </activity>
         <activity android:name=".activity.FoodInformationActivity">
             <intent-filter>
                 <action android:name="scos.action.FOODINFOMATION"/>
@@ -61,6 +62,23 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>-->
         </activity>
+        <activity android:name=".activity.FoodViewForEventBusActivity"/>
+
+        <!--服务-->
+        <service android:name=".service.ServerObserverService" android:process="es.source.code.observerservice">
+
+        </service>
+        <service android:name=".service.UpdateService">
+
+        </service>
+        <service android:name=".service.ServerObserverForEventBusService"/>
+
+        <!--广播接收-->
+        <receiver android:name="es.source.code.br.DeviceStartedListener">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

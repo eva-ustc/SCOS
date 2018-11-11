@@ -1,9 +1,11 @@
 package es.source.code.scos.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,12 +40,13 @@ public class FoodDetailedActivity extends Activity {
     private LayoutInflater mInflater;
     List<View> viewList =new ArrayList<>();
     private ViewAdapter mAdapter;
-
+    Integer item_id;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_detailed);
 
+        String item_foodName = getIntent().getStringExtra("foodName");
         mViewPager = this.findViewById(R.id.viewPage_foodDetailed);
         mInflater = LayoutInflater.from(this);
 
@@ -56,8 +59,12 @@ public class FoodDetailedActivity extends Activity {
             Button btn_itemAddOrDel = view.findViewById(R.id.btn_itemAddOrDel);
             // 初始化数据
             iv_foodDetailInfo_image.setImageResource((Integer) foodDatabase.get(i).get("image"));
-            tv_foodDetailInfo_name.setText((String)foodDatabase.get(i).get("foodName"));
-            tv_foodDetailInfo_price.setText((Float)foodDatabase.get(i).get("foodPrice")+"元");
+            String foodName = (String) foodDatabase.get(i).get("foodName");
+            tv_foodDetailInfo_name.setText(foodName);
+            if (TextUtils.equals(foodName,item_foodName)){
+                item_id = i;
+            }
+            tv_foodDetailInfo_price.setText(foodDatabase.get(i).get("foodPrice")+"元");
             et_foodDetailInfo_comm.setHint("备注信息:美食");
             if (orderFoodLists.contains(foodDatabase.get(i))){
                 btn_itemAddOrDel.setText("退点");
@@ -84,5 +91,12 @@ public class FoodDetailedActivity extends Activity {
         // 创建适配器
         mAdapter = new ViewAdapter(viewList);
         mViewPager.setAdapter(mAdapter);
+        if (item_id != null){
+
+            mViewPager.setCurrentItem(item_id);
+        }else {
+            mViewPager.setCurrentItem(foodDatabase.size()-1);
+        }
+
     }
 }

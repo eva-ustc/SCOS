@@ -23,5 +23,12 @@
         app:showAsAction="never"
         android:title="呼叫服务"
         />
+    <item
+        android:id="@+id/action_begin_or_stop_update"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="never"
+        android:title="启动实时更新"
+        />
+
 
 </menu>

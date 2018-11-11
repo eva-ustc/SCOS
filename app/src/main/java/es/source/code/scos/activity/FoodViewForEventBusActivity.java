@@ -18,7 +18,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +31,14 @@ import java.util.Map;
 
 import es.source.code.scos.ActivityUtils;
 import es.source.code.scos.Constants;
+import es.source.code.scos.EventMessage;
 import es.source.code.scos.R;
+import es.source.code.scos.ServiceEventMessage;
 import es.source.code.scos.adapters.FoodPageAdapter;
 import es.source.code.scos.fragments.FoodFragment;
 import es.source.code.scos.model.Database_food;
 import es.source.code.scos.model.User;
+import es.source.code.scos.service.ServerObserverForEventBusService;
 import es.source.code.scos.service.ServerObserverService;
 
 import static es.source.code.scos.activity.MainScreenGridViewActivity.orderFoodLists;
@@ -43,14 +51,15 @@ import static es.source.code.scos.activity.MainScreenGridViewActivity.orderFoodL
  * @description
  */
 
-public class FoodViewActivity extends AppCompatActivity {
-    public static final String Tag = "FoodViewActivity";
+public class FoodViewForEventBusActivity extends AppCompatActivity {
+    public static final String Tag = "FoodViewForEventBus";
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
     private String[] titles = {"冷菜", "热菜", "海鲜", "酒水"};
     List<FoodFragment> mFragments;
     private ListView mListView;
     private User mUser;
+    private boolean isBind = false;
 
 
     @Override
@@ -60,6 +69,55 @@ public class FoodViewActivity extends AppCompatActivity {
         initView();
         mListView = new ListView(this);
         mUser = getIntent().getParcelableExtra(Constants.USER_INFO);
+        EventBus.getDefault().register(this);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
+    /**
+     * Handler 处理接收到的消息
+     * @param message
+     */
+    @Subscribe(threadMode=ThreadMode.MAIN,sticky = true)
+    public void onReceiveEvent(EventMessage message){
+        switch (message.getContent()){
+            case 10:
+                // TODO 传入的what值为10,解析库存信息,更新菜品信息
+
+                Map<String,Object> foodinfo = message.getFoodInfo();
+                for(String foodName : foodinfo.keySet()){
+                    int stock = (int) foodinfo.get(foodName);
+                    Log.d(Tag ,"菜品: "+ foodName + "库存:" +stock);
+                }
+                updateFoodStock(foodinfo);
+                /*Bundle bundle = msg.getData();
+                for (Map<String,Object> foodStock : Database_food.foodDatabase){
+                    String foodName = (String) foodStock.get("foodName");
+                    int stock = bundle.getInt(foodName);
+                    Log.d(Tag ,"菜品: "+ foodName + "库存:" +stock);
+                }*/
+                break;
+            case 2:
+                // 传入的what值为2,解绑服务
+//                unbindService(conn_begin);
+                Intent intent = new Intent();
+                intent.setClass(this,ServerObserverForEventBusService.class);
+                stopService(intent);
+                isBind = false;
+                break;
+        }
+    }
+
+    private void updateFoodStock(Map<String, Object> foodinfo) {
+        TextView tv_stock = this.findViewById(R.id.tv_foodStockNum);
+        TextView tv_foodName = this.findViewById(R.id.tv_foodName);
+        Log.d(Tag ,tv_foodName.getText().toString());
+        Log.d(Tag ,tv_stock.getText().toString());
     }
 
     private void initView() {
@@ -121,11 +179,13 @@ public class FoodViewActivity extends AppCompatActivity {
 
                 if ("启动实时更新".equals(item.getTitle().toString())){
                     bindServerService(conn_begin);
+                    sendMessage(1);
                     Toast.makeText(this,"启动实时更新",Toast.LENGTH_SHORT).show();
                     // 发送Message.what=1
                     item.setTitle("停止实时更新");
-                }else {
-                    sendWhat2Service(0);
+                }else if ("停止实时更新".equals(item.getTitle().toString())){
+                    // 解绑服务,发送0
+                    sendMessage(0);
                     item.setTitle("启动实时更新");
                 }
                 return true;
@@ -134,88 +194,16 @@ public class FoodViewActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isBind = false;
-    private Messenger mServerMessenger = null;
-    private Messenger mClientMessenger = new Messenger(new ClientHandler());
-    private class ClientHandler extends Handler{
-
-        @Override
-        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-            switch (msg.what){
-                case 10:
-                    // TODO 传入的what值为10,解析库存信息,更新菜品信息
-                    Bundle bundle = msg.getData();
-                    for (Map<String,Object> foodStock : Database_food.foodDatabase){
-                        String foodName = (String) foodStock.get("foodName");
-                        int stock = bundle.getInt(foodName);
-                        Log.d(Tag ,"菜品: "+ foodName + "库存:" +stock);
-                    }
-                    break;
-                case 2:
-                    // 传入的what值为2,解绑服务
-                    unbindService(conn_begin);
-                    isBind = false;
-                    break;
-            }
-        }
-    }
-
     /**
-     * 发送1启动多线程实时更新
+     * 向服务端发送消息
+     * @param info 1/0
      */
-    private ServiceConnection conn_begin = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // 客户端与Service建立连接
-            Log.d(Tag ,"客户端 onServiceConnected");
-
-            // 从Service的onBind()方法返回的IBinder初始化一个指向Service端的Messenger
-            mServerMessenger = new Messenger(service);
-//            isBind = true;
-            sendWhat2Service(1);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mServerMessenger = null;
-            isBind = false;
-            Log.d(Tag ,"客户端 onServiceDisConnected");
-        }
-    };
-/*    private ServiceConnection conn_stop = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // 客户端与Service建立连接
-            Log.d(Tag ,"客户端 onServiceConnected");
-
-            // 从Service的onBind()方法返回的IBinder初始化一个指向Service端的Messenger
-            mServerMessenger = new Messenger(service);
-//            isBind = true;
-            sendWhat2Service(0);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mServerMessenger = null;
-            isBind = false;
-            Log.d(Tag ,"客户端 onServiceDisConnected");
-        }
-    };*/
-
-    private void sendWhat2Service(int what) {
-        Message msg = Message.obtain();
-        msg.what = what;
-        // 将Message 的replyTo设置为客户端的ClientMessenger,以便Service可以向客户端发送消息
-        msg.replyTo = mClientMessenger;
-        try {
-            Log.d(Tag ,"向Service发送Message.what=1/0");
-            mServerMessenger.send(msg);
-        } catch (RemoteException e) {
-            Log.d(Tag ,"向Service发送Message失败!");
-            e.printStackTrace();
-        }
+    private void sendMessage(int info) {
+        EventMessage message = new EventMessage();
+        message.setContent(info);
+        EventBus.getDefault().postSticky(message);
     }
+
 
     /**
      * 点击了启动实时更新,开启服务
@@ -224,12 +212,29 @@ public class FoodViewActivity extends AppCompatActivity {
 
         if (!isBind){ // 如果没有绑定服务
             Intent intent = new Intent();
-            intent.setClass(this,ServerObserverService.class);
+            intent.setClass(this,ServerObserverForEventBusService.class);
 //            startService(intent);
-            isBind = bindService(intent,conn,BIND_AUTO_CREATE);
-            return isBind;
+            startService(intent);
+            isBind = true;
+//            isBind = bindService(intent,conn,BIND_AUTO_CREATE);
         }
-        return false;
+        return isBind;
     }
+    /**
+     * 发送1启动多线程实时更新
+     */
+    private ServiceConnection conn_begin = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // 客户端与Service建立连接
+            Log.d(Tag ,"客户端 onServiceConnected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBind = false;
+            Log.d(Tag ,"客户端 onServiceDisConnected");
+        }
+    };
 }
 

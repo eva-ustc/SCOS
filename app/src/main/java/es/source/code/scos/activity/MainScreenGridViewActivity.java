@@ -18,9 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import es.source.code.scos.ActivityUtils;
 import es.source.code.scos.Constants;
 import es.source.code.scos.R;
 import es.source.code.scos.model.User;
+import es.source.code.scos.service.UpdateService;
 
 import static es.source.code.scos.Constants.USER_INFO;
 
@@ -178,8 +180,11 @@ public class MainScreenGridViewActivity extends Activity{
                 Intent intent;
                switch (position){
                    case 0: // 点菜
+                       Intent serverLauncher = new Intent(MainScreenGridViewActivity.this,UpdateService.class);
+                       startService(serverLauncher);
                        Toast.makeText(MainScreenGridViewActivity.this,"先点菜吧...",Toast.LENGTH_SHORT).show();
-                       ActivityUtils.redirectTo(MainScreenGridViewActivity.this,FoodViewActivity.class);
+//                       ActivityUtils.redirectTo(MainScreenGridViewActivity.this,FoodViewActivity.class);
+                       ActivityUtils.redirectTo(MainScreenGridViewActivity.this,FoodViewForEventBusActivity.class);
                        break;
                    case 1: // 查看订单
                        Toast.makeText(MainScreenGridViewActivity.this,"看下订单...",Toast.LENGTH_SHORT).show();

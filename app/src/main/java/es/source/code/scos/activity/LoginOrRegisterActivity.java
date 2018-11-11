@@ -13,15 +13,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import es.source.code.scos.Constants;
 import es.source.code.scos.R;
 import es.source.code.scos.model.User;
-
-import static es.source.code.scos.activity.MainScreenGridViewActivity.Tag;
-
 /**
  * @author LRK
  * @project_name SCOS
@@ -32,7 +38,7 @@ import static es.source.code.scos.activity.MainScreenGridViewActivity.Tag;
 
 public class LoginOrRegisterActivity extends Activity implements View.OnClickListener {
 
-    public static final String TAG = "LoginOrRegisterActivity";
+    public static final String Tag = "LoginOrRegisterActivity";
     private Button mBtn_login;
     private Button mBtn_return;
     private TextView mEt_account;
@@ -97,7 +103,10 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        if (v == mBtn_return){ // 点击返回
+        /**
+         * 点击返回
+         */
+        if (v == mBtn_return){
             // 判断是否有用户名记录
             if (getUsername()!=null){
                 updateUserInfo(null,false);
@@ -110,10 +119,14 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
         boolean checkResult = checkAccount() && checkPassword();
         String str_account = mEt_account.getText().toString().trim();
         String str_password = mEt_password.getText().toString().trim();
-        if (v == mBtn_login){ // 点击登陆
+        /**
+         *  点击登陆/注册
+         */
+        if (v == mBtn_login){
             if (checkResult){
                 updateUserInfo(mSp_username,true);
-                doProgress(); // 处理进度条函数
+                serverValidator();
+
             }
         }else if (v == mTv_register){ // 注册
             if (checkResult){
@@ -129,7 +142,69 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
                 redirect2MainScreen(Constants.PACKAGE_NAME,"RegisterSuccess",loginUser);
             }
         }
-        Log.d(TAG,"username: " + getUsername());
+        Log.d(Tag,"username: " + getUsername());
+    }
+
+    /**
+     * 设置get请求参数
+     */
+    private void serverValidator() {
+        doGet("http://10.0.2.2:8080/scos/login?username="+mEt_account.getText().toString().trim()
+                +"&password="+mEt_password.getText().toString().trim());
+    }
+
+    private void doGet(final String path){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(path.trim());
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    if (200 == urlConnection.getResponseCode()){
+                        InputStream is = urlConnection.getInputStream();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        byte[] buffer = new byte[1024];
+                        int len = 0;
+                        while (-1 != (len = is.read(buffer))){
+                            baos.write(buffer,0,len);
+                            baos.flush();
+                        }
+                        String msg = baos.toString();
+                        getJSONData(msg);
+                        Log.d(Tag, msg);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
+    private void getJSONData(String msg) {
+        try {
+            JSONObject root = new JSONObject(msg);
+            int resultcode = root.getInt("RESULTCODE");
+            if (resultcode == 1){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        doProgress(); // 处理进度条函数
+                        Toast.makeText(LoginOrRegisterActivity.this,"resultCode==1,登陆验证成功!",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else if (resultcode == 0){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LoginOrRegisterActivity.this,"resultCode==0,登陆验证失败!",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            Log.d(Tag,"获取resultCode: "+ resultcode);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -162,11 +237,11 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
         mPattern = Pattern.compile("[a-zA-Z0-9]+");
         mMatcher = mPattern.matcher(str_password);
         if (mMatcher.matches()){
-            Toast.makeText(this,"匹配成功",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this,"匹配成功",Toast.LENGTH_SHORT).show();
             return true;
         }else {
             mEt_password.setError("输入密码不符合规则!");
-            Toast.makeText(this,"匹配不成功",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this,"匹配不成功",Toast.LENGTH_SHORT).show();
             return false;
         }
     }
@@ -196,28 +271,28 @@ public class LoginOrRegisterActivity extends Activity implements View.OnClickLis
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                        int progress = mProgressBar_login.getProgress();
-                        try {
-                            while (progress < mProgressBar_login.getMax()) {
-                                mProgressBar_login.incrementProgressBy(5);
-                                progress = mProgressBar_login.getProgress();
-                                Thread.sleep(100);
-                            }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressBar_login.setVisibility(View.INVISIBLE);
-                                User user = new User();
-                                user.setUserName(mEt_account.getText().toString().trim());
-                                user.setPassword(mEt_password.getText().toString().trim());
-                                user.setOldUser(true);
-                                redirect2MainScreen(Constants.PACKAGE_NAME, "LoginSuccess",user);
+                int progress = mProgressBar_login.getProgress();
+                try {
+                    while (progress < mProgressBar_login.getMax()) {
+                        mProgressBar_login.incrementProgressBy(5);
+                        progress = mProgressBar_login.getProgress();
+                        Thread.sleep(100);
+                    }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mProgressBar_login.setVisibility(View.INVISIBLE);
+                        User user = new User();
+                        user.setUserName(mEt_account.getText().toString().trim());
+                        user.setPassword(mEt_password.getText().toString().trim());
+                        user.setOldUser(true);
+                        redirect2MainScreen(Constants.PACKAGE_NAME, "LoginSuccess",user);
 
-                            }
-                        });
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    }
+                });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
         thread.start();

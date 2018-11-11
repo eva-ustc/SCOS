@@ -113,15 +113,16 @@ public class FoodListViewAdapter extends BaseAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              /*  Toast.makeText(mContext,"菜品详细信息",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,"菜品详细信息",Toast.LENGTH_SHORT).show();
                 Map<String,Object> foodinfo = mData.get(position);
-                Intent intent = new Intent(mContext, FoodInformationActivity.class);
+//                Intent intent = new Intent(mContext, FoodInformationActivity.class);
+                Intent intent = new Intent(mContext, FoodDetailedActivity.class);
                 intent.putExtra("image",(Integer)foodinfo.get("image"));
                 intent.putExtra("foodName",(String) foodinfo.get("foodName"));
                 intent.putExtra("foodPrice", (Float) foodinfo.get("foodPrice"));
 
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);*/
-              Intent intent = new Intent(mContext, FoodDetailedActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+              //intent = new Intent(mContext, FoodDetailedActivity.class);
               mContext.startActivity(intent);
             }
         });

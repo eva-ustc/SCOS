@@ -2,6 +2,7 @@ package es.source.code.scos.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,7 +27,9 @@ import java.util.Map;
 
 import es.source.code.scos.Constants;
 import es.source.code.scos.R;
+import es.source.code.scos.activity.MainScreenGridViewActivity;
 import es.source.code.scos.adapters.OrderListViewAdapter;
+import es.source.code.scos.model.Database_food;
 import es.source.code.scos.model.User;
 
 import static es.source.code.scos.activity.MainScreenGridViewActivity.Tag;
@@ -92,6 +95,17 @@ public class OrderFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try{
+                // 在库存里减去已结账菜品
+                for(Map<String,Object> food_db :Database_food.foodDatabase){
+                    String foodName_db = (String) food_db.get("foodName");
+                    for (Map<String,Object> food_order :orderedFoodLists){
+                        String foodName_order = (String) food_order.get("foodName");
+                        if (foodName_db.equals(foodName_order)){
+                            Integer foodStock = (Integer) food_db.get("foodStock");
+                            food_db.put("foodStock", foodStock -1);
+                        }
+                    }
+                }
                 int count =0;
                 while (count < 100){
                     count++;
@@ -257,7 +271,7 @@ public class OrderFragment extends Fragment {
     private float getSum(List<Map<String, Object>> mList) {
         float sum = 0;
         for(Map<String,Object> map : mList){
-            sum += (Float) map.get("foodPrice");
+            sum += (Double) map.get("foodPrice");
         }
         return sum;
     }
